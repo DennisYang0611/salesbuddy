@@ -1,0 +1,11 @@
+node_modules/
+.next/
+pnpm-lock.yaml
+yarn.lock
+*.tsbuildinfo
+.env.local
+.env
+.venv/
+__pycache__/
+*.pyc
+contract/__pycache__/
