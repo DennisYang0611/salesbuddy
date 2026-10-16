@@ -8,6 +8,7 @@ const nav = [
   { href: "/home", label: "工作台", icon: BriefcaseBusiness },
   { href: "/materials", label: "材料中心", icon: FolderOpen },
   { href: "/quotes", label: "报价单", icon: ReceiptText },
+  { href: "/materials/version-comparison", label: "版本对比与报价", icon: FileText },
   { href: "/contracts/new", label: "自动化做合同", icon: FilePenLine },
 ];
 
