@@ -1,8 +1,8 @@
 "use client";
 
-import { ArrowLeft, ArrowUpRight, ExternalLink, FileText, Search } from "lucide-react";
+import { ArrowLeft, ArrowUpRight, CheckCircle2, ExternalLink, FileText, Search } from "lucide-react";
 import { useMemo, useState } from "react";
-import { deliveryRows, detailHeaders, detailSections, expertRows, referenceFeatureHeaders, referenceFeatureSections, sourceUpdatedAt, versionPlans } from "./data";
+import { deliveryRows, detailHeaders, detailSections, expertRows, referenceFeatureHeaders, referenceFeatureSections, sourceUpdatedAt, sourceUrl, supportPlans, versionPlans } from "./data";
 import styles from "./page.module.css";
 
 type Tab = "summary" | "detail" | "service";
@@ -29,7 +29,7 @@ export default function VersionComparisonPage() {
     </header>
     <div className={styles.inner}>
       <section className={styles.hero}>
-        <div><p className={styles.eyebrow}>PRODUCT COMPARISON · FASTGPT</p><h1>版本对比与报价</h1><p>把部署形态、版本能力、服务等级和价格集中在一个页面，先快速推荐，再展开功能细节。</p></div>
+        <div><p className={styles.eyebrow}>PRODUCT COMPARISON · FASTGPT</p><h1>版本对比与报价</h1><p>基于最新版本对比表整理，快速看清授权方式、功能差异与服务费用，再进入报价单。</p></div>
         <div className={styles.heroMeta}><FileText size={17} /><span>资料同步于 {sourceUpdatedAt}</span></div>
       </section>
       <nav className={styles.tabs} aria-label="版本对比视图">
@@ -38,7 +38,7 @@ export default function VersionComparisonPage() {
       {tab === "summary" && <SummaryView />}
       {tab === "detail" && <DetailView query={query} setQuery={setQuery} sections={filteredSections} />}
       {tab === "service" && <ServiceView />}
-      <footer className={styles.footer}><a href="/materials"><ArrowLeft size={14} /> 返回材料中心</a><span>SalesKit · FastGPT 商务材料</span></footer>
+      <footer className={styles.footer}><a href="/materials"><ArrowLeft size={14} /> 返回材料中心</a><span><a href={sourceUrl} target="_blank" rel="noreferrer">查看源资料</a> · SalesKit · FastGPT 商务材料</span></footer>
     </div>
   </main>;
 }
@@ -58,7 +58,7 @@ function SummaryView() {
           <th>{familyLabel(plan.family)}</th><td><strong>{plan.name}</strong></td><td className={styles.money}>{formatPrice(plan.singleBuy)}</td><td className={styles.money}>{formatPrice(plan.singleYear)}</td><td className={styles.money}>{formatPrice(plan.clusterBuy)}</td><td className={styles.money}>{formatPrice(plan.clusterYear)}</td><td>{plan.users}</td><td><span className={styles.level}>{plan.support}</span></td><td><span className={plan.coverage === 0 ? styles.mutedPill : styles.goodPill}>{plan.coverage} / 16</span></td>
         </tr>)}</tbody>
       </table></div>
-      <p className={styles.note}>F4 专业版、旗舰版单机年订阅按本次销售价格更新；F5 企业版及集群报价保留。 “—”表示未提供该项价格或能力。</p>
+      <p className={styles.note}>专业版单机订阅按年 ¥80,000，旗舰版单机订阅按年 ¥140,000；报价按本次销售口径更新。 “—”表示未提供该项价格或能力。</p>
     </section>
     <ReferenceFeatureComparison />
     <section className={styles.recommend}><div><p className={styles.kicker}>SALES TIP</p><h2>推荐路径</h2><p>先按部署形态和用户规模筛选版本，再打开“详细功能矩阵”核对权限、知识库、工作流和系统能力。</p></div><a href="/quotes">打开报价单 <ArrowUpRight size={14} /></a></section>
@@ -110,6 +110,7 @@ function FeatureSection({ section }: { section: DetailSection }) {
 
 function ServiceView() {
   return <>
+    <section className={styles.serviceGrid}>{supportPlans.map((plan, index) => <article key={plan.level} className={`${styles.serviceCard} ${index === 3 ? styles.serviceFeatured : ""}`}><div className={styles.serviceTop}><span>技术支持</span><b>{plan.level}</b></div><h2>¥{formatPrice(plan.price).replace(/^¥/, "")}</h2><p>{plan.content}</p><div className={styles.serviceMark}><CheckCircle2 size={13} /> 独立购买 / 年</div></article>)}</section>
     <section className={styles.panel}><div className={styles.panelHead}><div><p className={styles.kicker}>DELIVERY MODE</p><h2>交付模式</h2></div><span>原厂顾问 / 授权三方</span></div><div className={styles.tableWrap}><table className={styles.serviceTable}><thead><tr><th>交付方式</th><th>原厂顾问</th><th>授权三方</th></tr></thead><tbody>{deliveryRows.map((row) => <tr key={row.mode}><td>{row.mode}</td><td>{row.official}</td><td>{row.partner}</td></tr>)}</tbody></table></div></section>
     <section className={styles.panel}><div className={styles.panelHead}><div><p className={styles.kicker}>EXPERT SERVICES</p><h2>专家服务</h2></div><span>培训与售前支持</span></div><div className={styles.tableWrap}><table className={styles.serviceTable}><thead><tr><th>专家类型</th><th>培训费用</th><th>备注</th></tr></thead><tbody>{expertRows.map((row) => <tr key={row.type}><td>{row.type}</td><td>{row.price}</td><td>{row.note || "-"}</td></tr>)}</tbody></table></div></section>
   </>;

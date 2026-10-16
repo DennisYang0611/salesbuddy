@@ -1,35 +1,9 @@
-// 静态快照：来源于飞书“FastGPT版本对比与报价”，最近同步 2026-10-13。
+// FastGPT版本对比与报价，来源：飞书 Wiki「FastGPT版本对比与报价」
+// 页面同步日期：2026-10-13。
 export const sourceUpdatedAt = "2026-10-13";
-export const detailHeaders = [
-  "开源版",
-  "F4 轻量版",
-  "F4 标准版",
-  "F4 专业版",
-  "F4 旗舰版",
-  "F5 专业版",
-  "F5 旗舰版",
-  "F5 定制版"
-] as const;
-export const simpleFeatures = [
-  "索引增强",
-  "智能切片",
-  "外部知识库",
-  "web站点同步",
-  "文档标签",
-  "文档权限",
-  "权限管控",
-  "团队应用",
-  "身份验证",
-  "用量管控",
-  "IM对接",
-  "Markdown 转文件",
-  "团队云端记录",
-  "团队插件",
-  "沙箱环境",
-  "skills"
-] as const;
-
-// 参考 FastGPT 软件版本对比页整理的销售重点能力，供销售速览使用。
+export const sourceUrl = "https://fael3z0zfze.feishu.cn/wiki/Z8zvwec5XiaSdSkjKbecYu7GnZe?from=from_copylink";
+export const detailHeaders = ["开源版","F4 轻量版","F4 标准版","F4 专业版","F4 旗舰版","F5 专业版","F5 旗舰版","F5 定制版"] as const;
+export const simpleFeatures = ["索引增强","智能切片","外部知识库","web站点同步","文档标签","文档权限","权限管控","团队应用","身份验证","用量管控","IM对接","Markdown 转文件","团队云端记录","团队插件","沙箱环境","skills"] as const;
 export const referenceFeatureHeaders = ["开源版", "标准版", "专业版", "旗舰版"] as const;
 export const referenceFeatureSections = [
   {
@@ -69,6 +43,7 @@ export const referenceFeatureSections = [
     ]
   }
 ] as const;
+
 export const versionPlans = [
   {
     "family": "开源版（F3）",
@@ -81,67 +56,67 @@ export const versionPlans = [
     "support": "社区",
     "features": [
       {
-        "name": "索引增强",
+        "name": "知识库",
         "supported": "❌"
       },
       {
-        "name": "智能切片",
+        "name": "col15",
         "supported": "❌"
       },
       {
-        "name": "外部知识库",
+        "name": "col16",
         "supported": "❌"
       },
       {
-        "name": "web站点同步",
+        "name": "col17",
         "supported": "❌"
       },
       {
-        "name": "文档标签",
+        "name": "col18",
         "supported": "❌"
       },
       {
-        "name": "文档权限",
+        "name": "col19",
         "supported": "❌"
       },
       {
-        "name": "权限管控",
+        "name": "col20",
         "supported": "❌"
       },
       {
-        "name": "团队应用",
+        "name": "应用",
         "supported": "❌"
       },
       {
-        "name": "身份验证",
+        "name": "col22",
         "supported": "❌"
       },
       {
-        "name": "用量管控",
+        "name": "col23",
         "supported": "❌"
       },
       {
-        "name": "IM对接",
+        "name": "col24",
         "supported": "❌"
       },
       {
-        "name": "Markdown 转文件",
+        "name": "col25",
         "supported": "❌"
       },
       {
-        "name": "团队云端记录",
+        "name": "col26",
         "supported": "❌"
       },
       {
-        "name": "团队插件",
-        "supported": "❌"
-      },
-      {
-        "name": "沙箱环境",
+        "name": "col27",
         "supported": "❌"
       },
       {
         "name": "skills",
+        "supported": "❌"
+      },
+      {
+        "name": "col29",
         "supported": "❌"
       }
     ],
@@ -158,67 +133,67 @@ export const versionPlans = [
     "support": "L3",
     "features": [
       {
-        "name": "索引增强",
+        "name": "知识库",
         "supported": "✅"
       },
       {
-        "name": "智能切片",
+        "name": "col15",
         "supported": "✅"
       },
       {
-        "name": "外部知识库",
+        "name": "col16",
         "supported": "✅"
       },
       {
-        "name": "web站点同步",
+        "name": "col17",
         "supported": "✅"
       },
       {
-        "name": "文档标签",
+        "name": "col18",
         "supported": "✅"
       },
       {
-        "name": "文档权限",
+        "name": "col19",
         "supported": "✅"
       },
       {
-        "name": "权限管控",
+        "name": "col20",
         "supported": "✅"
       },
       {
-        "name": "团队应用",
+        "name": "应用",
         "supported": "✅"
       },
       {
-        "name": "身份验证",
+        "name": "col22",
         "supported": "✅"
       },
       {
-        "name": "用量管控",
+        "name": "col23",
         "supported": "✅"
       },
       {
-        "name": "IM对接",
+        "name": "col24",
         "supported": "✅"
       },
       {
-        "name": "Markdown 转文件",
+        "name": "col25",
         "supported": "✅"
       },
       {
-        "name": "团队云端记录",
+        "name": "col26",
         "supported": "✅"
       },
       {
-        "name": "团队插件",
-        "supported": "✅"
-      },
-      {
-        "name": "沙箱环境",
+        "name": "col27",
         "supported": "✅"
       },
       {
         "name": "skills",
+        "supported": "✅"
+      },
+      {
+        "name": "col29",
         "supported": "✅"
       }
     ],
@@ -235,67 +210,67 @@ export const versionPlans = [
     "support": "L2",
     "features": [
       {
-        "name": "索引增强",
+        "name": "知识库",
         "supported": "✅"
       },
       {
-        "name": "智能切片",
+        "name": "col15",
         "supported": "✅"
       },
       {
-        "name": "外部知识库",
+        "name": "col16",
         "supported": "✅"
       },
       {
-        "name": "web站点同步",
+        "name": "col17",
         "supported": "✅"
       },
       {
-        "name": "文档标签",
+        "name": "col18",
         "supported": "✅"
       },
       {
-        "name": "文档权限",
+        "name": "col19",
         "supported": "✅"
       },
       {
-        "name": "权限管控",
+        "name": "col20",
         "supported": "✅"
       },
       {
-        "name": "团队应用",
+        "name": "应用",
         "supported": "✅"
       },
       {
-        "name": "身份验证",
+        "name": "col22",
         "supported": "✅"
       },
       {
-        "name": "用量管控",
+        "name": "col23",
         "supported": "✅"
       },
       {
-        "name": "IM对接",
+        "name": "col24",
         "supported": "✅"
       },
       {
-        "name": "Markdown 转文件",
+        "name": "col25",
         "supported": "✅"
       },
       {
-        "name": "团队云端记录",
+        "name": "col26",
         "supported": "✅"
       },
       {
-        "name": "团队插件",
-        "supported": "✅"
-      },
-      {
-        "name": "沙箱环境",
+        "name": "col27",
         "supported": "✅"
       },
       {
         "name": "skills",
+        "supported": "✅"
+      },
+      {
+        "name": "col29",
         "supported": "✅"
       }
     ],
@@ -312,67 +287,67 @@ export const versionPlans = [
     "support": "L1",
     "features": [
       {
-        "name": "索引增强",
+        "name": "知识库",
         "supported": "✅"
       },
       {
-        "name": "智能切片",
+        "name": "col15",
         "supported": "✅"
       },
       {
-        "name": "外部知识库",
+        "name": "col16",
         "supported": "✅"
       },
       {
-        "name": "web站点同步",
+        "name": "col17",
         "supported": "✅"
       },
       {
-        "name": "文档标签",
+        "name": "col18",
         "supported": "✅"
       },
       {
-        "name": "文档权限",
+        "name": "col19",
         "supported": "✅"
       },
       {
-        "name": "权限管控",
+        "name": "col20",
         "supported": "✅"
       },
       {
-        "name": "团队应用",
+        "name": "应用",
         "supported": "✅"
       },
       {
-        "name": "身份验证",
+        "name": "col22",
         "supported": "✅"
       },
       {
-        "name": "用量管控",
+        "name": "col23",
         "supported": "✅"
       },
       {
-        "name": "IM对接",
+        "name": "col24",
         "supported": "✅"
       },
       {
-        "name": "Markdown 转文件",
+        "name": "col25",
         "supported": "✅"
       },
       {
-        "name": "团队云端记录",
+        "name": "col26",
         "supported": "✅"
       },
       {
-        "name": "团队插件",
-        "supported": "✅"
-      },
-      {
-        "name": "沙箱环境",
+        "name": "col27",
         "supported": "✅"
       },
       {
         "name": "skills",
+        "supported": "✅"
+      },
+      {
+        "name": "col29",
         "supported": "✅"
       }
     ],
@@ -389,67 +364,67 @@ export const versionPlans = [
     "support": "L0",
     "features": [
       {
-        "name": "索引增强",
+        "name": "知识库",
         "supported": "✅"
       },
       {
-        "name": "智能切片",
+        "name": "col15",
         "supported": "✅"
       },
       {
-        "name": "外部知识库",
+        "name": "col16",
         "supported": "✅"
       },
       {
-        "name": "web站点同步",
+        "name": "col17",
         "supported": "✅"
       },
       {
-        "name": "文档标签",
+        "name": "col18",
         "supported": "✅"
       },
       {
-        "name": "文档权限",
+        "name": "col19",
         "supported": "✅"
       },
       {
-        "name": "权限管控",
+        "name": "col20",
         "supported": "✅"
       },
       {
-        "name": "团队应用",
+        "name": "应用",
         "supported": "✅"
       },
       {
-        "name": "身份验证",
+        "name": "col22",
         "supported": "✅"
       },
       {
-        "name": "用量管控",
+        "name": "col23",
         "supported": "✅"
       },
       {
-        "name": "IM对接",
+        "name": "col24",
         "supported": "✅"
       },
       {
-        "name": "Markdown 转文件",
+        "name": "col25",
         "supported": "✅"
       },
       {
-        "name": "团队云端记录",
+        "name": "col26",
         "supported": "✅"
       },
       {
-        "name": "团队插件",
-        "supported": "✅"
-      },
-      {
-        "name": "沙箱环境",
+        "name": "col27",
         "supported": "✅"
       },
       {
         "name": "skills",
+        "supported": "✅"
+      },
+      {
+        "name": "col29",
         "supported": "✅"
       }
     ],
@@ -466,67 +441,67 @@ export const versionPlans = [
     "support": "L0",
     "features": [
       {
-        "name": "索引增强",
+        "name": "知识库",
         "supported": "✅"
       },
       {
-        "name": "智能切片",
+        "name": "col15",
         "supported": "✅"
       },
       {
-        "name": "外部知识库",
+        "name": "col16",
         "supported": "✅"
       },
       {
-        "name": "web站点同步",
+        "name": "col17",
         "supported": "✅"
       },
       {
-        "name": "文档标签",
+        "name": "col18",
         "supported": "✅"
       },
       {
-        "name": "文档权限",
+        "name": "col19",
         "supported": "✅"
       },
       {
-        "name": "权限管控",
+        "name": "col20",
         "supported": "✅"
       },
       {
-        "name": "团队应用",
+        "name": "应用",
         "supported": "✅"
       },
       {
-        "name": "身份验证",
+        "name": "col22",
         "supported": "✅"
       },
       {
-        "name": "用量管控",
+        "name": "col23",
         "supported": "✅"
       },
       {
-        "name": "IM对接",
+        "name": "col24",
         "supported": "✅"
       },
       {
-        "name": "Markdown 转文件",
+        "name": "col25",
         "supported": "✅"
       },
       {
-        "name": "团队云端记录",
+        "name": "col26",
         "supported": "✅"
       },
       {
-        "name": "团队插件",
-        "supported": "✅"
-      },
-      {
-        "name": "沙箱环境",
+        "name": "col27",
         "supported": "✅"
       },
       {
         "name": "skills",
+        "supported": "✅"
+      },
+      {
+        "name": "col29",
         "supported": "✅"
       }
     ],
@@ -543,67 +518,67 @@ export const versionPlans = [
     "support": "L0",
     "features": [
       {
-        "name": "索引增强",
+        "name": "知识库",
         "supported": "✅"
       },
       {
-        "name": "智能切片",
+        "name": "col15",
         "supported": "✅"
       },
       {
-        "name": "外部知识库",
+        "name": "col16",
         "supported": "✅"
       },
       {
-        "name": "web站点同步",
+        "name": "col17",
         "supported": "✅"
       },
       {
-        "name": "文档标签",
+        "name": "col18",
         "supported": "✅"
       },
       {
-        "name": "文档权限",
+        "name": "col19",
         "supported": "✅"
       },
       {
-        "name": "权限管控",
+        "name": "col20",
         "supported": "✅"
       },
       {
-        "name": "团队应用",
+        "name": "应用",
         "supported": "✅"
       },
       {
-        "name": "身份验证",
+        "name": "col22",
         "supported": "✅"
       },
       {
-        "name": "用量管控",
+        "name": "col23",
         "supported": "✅"
       },
       {
-        "name": "IM对接",
+        "name": "col24",
         "supported": "✅"
       },
       {
-        "name": "Markdown 转文件",
+        "name": "col25",
         "supported": "✅"
       },
       {
-        "name": "团队云端记录",
+        "name": "col26",
         "supported": "✅"
       },
       {
-        "name": "团队插件",
-        "supported": "✅"
-      },
-      {
-        "name": "沙箱环境",
+        "name": "col27",
         "supported": "✅"
       },
       {
         "name": "skills",
+        "supported": "✅"
+      },
+      {
+        "name": "col29",
         "supported": "✅"
       }
     ],
@@ -716,7 +691,7 @@ export const detailSections = [
       },
       {
         "name": "应用权限配置",
-        "doc": "FastGPT应用管理规范 ",
+        "doc": "FastGPT应用管理规范",
         "values": [
           "❌",
           "✅",
@@ -731,7 +706,7 @@ export const detailSections = [
       },
       {
         "name": "知识库权限配置",
-        "doc": "FastGPT知识库管理规范 ",
+        "doc": "FastGPT知识库管理规范",
         "values": [
           "❌",
           "✅",
@@ -886,7 +861,7 @@ export const detailSections = [
       },
       {
         "name": "应用权限配置",
-        "doc": " FastGPT应用管理规范 ",
+        "doc": "FastGPT应用管理规范",
         "values": [
           "❌",
           "✅",
@@ -1176,7 +1151,7 @@ export const detailSections = [
       },
       {
         "name": "知识库权限配置",
-        "doc": "FastGPT知识库管理规范 ",
+        "doc": "FastGPT知识库管理规范",
         "values": [
           "❌",
           "✅",
