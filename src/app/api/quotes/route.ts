@@ -23,7 +23,8 @@ export async function POST(request: Request) {
     const body = await request.json();
     const customerName = String(body.customerName ?? "").trim();
     const items = Array.isArray(body.items) ? body.items.filter((item: { name?: string }) => String(item?.name ?? "").trim()).slice(0, 4) : [];
-    const required = [body.sellerName, body.sellerAddress, body.sellerPhone, body.customerName, body.customerContact, body.customerPhone, body.quoteDate, body.validUntil, body.owner];
+    const required = [body.sellerName, body.sellerAddress, body.customerName, body.customerContact, body.customerPhone, body.quoteDate, body.validUntil, body.owner];
+    if (body.sellerPhoneVisible !== false && !String(body.sellerPhone ?? "").trim()) required.push(body.sellerPhone);
     if (required.some((value) => !String(value ?? "").trim()) || !items.length) return NextResponse.json({ error: "请完整填写报价信息和至少一项明细" }, { status: 400 });
     const softwareVersion = String(items[0].name ?? "产品报价").trim();
     const servicePackage = items.slice(1).map((item: { name?: string }) => String(item.name ?? "").trim()).join("、") || "未添加技术服务";

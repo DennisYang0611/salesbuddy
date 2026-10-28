@@ -1,8 +1,8 @@
 "use client";
 
-import { ArrowLeft, ArrowUpRight, CheckCircle2, ExternalLink, FileText, Search } from "lucide-react";
+import { ArrowLeft, ArrowUpRight, ExternalLink, FileText, Search } from "lucide-react";
 import { useMemo, useState } from "react";
-import { deliveryRows, detailHeaders, detailSections, expertRows, referenceFeatureHeaders, referenceFeatureSections, sourceUpdatedAt, sourceUrl, supportPlans, versionPlans } from "./data";
+import { deliveryRows, detailHeaders, detailSections, expertRows, referenceFeatureHeaders, referenceFeatureSections, sourceUpdatedAt, sourceUrl, versionPlans } from "./data";
 import styles from "./page.module.css";
 
 type Tab = "summary" | "detail" | "service";
@@ -110,7 +110,6 @@ function FeatureSection({ section }: { section: DetailSection }) {
 
 function ServiceView() {
   return <>
-    <section className={styles.serviceGrid}>{supportPlans.map((plan, index) => <article key={plan.level} className={`${styles.serviceCard} ${index === 3 ? styles.serviceFeatured : ""}`}><div className={styles.serviceTop}><span>技术支持</span><b>{plan.level}</b></div><h2>¥{formatPrice(plan.price).replace(/^¥/, "")}</h2><p>{plan.content}</p><div className={styles.serviceMark}><CheckCircle2 size={13} /> 独立购买 / 年</div></article>)}</section>
     <section className={styles.panel}><div className={styles.panelHead}><div><p className={styles.kicker}>DELIVERY MODE</p><h2>交付模式</h2></div><span>原厂顾问 / 授权三方</span></div><div className={styles.tableWrap}><table className={styles.serviceTable}><thead><tr><th>交付方式</th><th>原厂顾问</th><th>授权三方</th></tr></thead><tbody>{deliveryRows.map((row) => <tr key={row.mode}><td>{row.mode}</td><td>{row.official}</td><td>{row.partner}</td></tr>)}</tbody></table></div></section>
     <section className={styles.panel}><div className={styles.panelHead}><div><p className={styles.kicker}>EXPERT SERVICES</p><h2>专家服务</h2></div><span>培训与售前支持</span></div><div className={styles.tableWrap}><table className={styles.serviceTable}><thead><tr><th>专家类型</th><th>培训费用</th><th>备注</th></tr></thead><tbody>{expertRows.map((row) => <tr key={row.type}><td>{row.type}</td><td>{row.price}</td><td>{row.note || "-"}</td></tr>)}</tbody></table></div></section>
   </>;
