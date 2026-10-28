@@ -32,6 +32,16 @@ def set_run_text(run, text):
         extra.text = ""
 
 
+def set_paragraph_text(paragraph, text):
+    runs = paragraph_runs(paragraph)
+    if not runs:
+        append_value(paragraph, text)
+        return
+    set_run_text(runs[0], text)
+    for run in runs[1:]:
+        set_run_text(run, "")
+
+
 def paragraph_runs(paragraph):
     return paragraph.findall(".//w:r", NS)
 
@@ -52,9 +62,101 @@ def append_value(paragraph, text):
 
 
 def replace_underlined_runs(paragraph, values):
-    slots = [run for run in paragraph_runs(paragraph) if run.find("w:rPr/w:u", NS) is not None]
-    for slot, text in zip(slots, values):
-        set_run_text(slot, text)
+    slots = [
+        run for run in paragraph_runs(paragraph)
+        if run.find("w:rPr/w:u", NS) is not None
+        and not run_text(run).strip()
+    ]
+    for index, slot in enumerate(slots):
+        set_run_text(slot, values[index] if index < len(values) else "")
+
+
+def fill_footer_page_number(xml_bytes):
+    """Give first-page and regular footers the same live PAGE field."""
+    root = ET.fromstring(xml_bytes)
+    paragraph = root.find("w:p", NS)
+    if paragraph is None:
+        paragraph = ET.SubElement(root, q("p"))
+    paragraph_properties = paragraph.find("w:pPr", NS)
+    for child in list(paragraph):
+        if child is not paragraph_properties:
+            paragraph.remove(child)
+    if paragraph_properties is None:
+        paragraph_properties = ET.Element(q("pPr"))
+        paragraph.insert(0, paragraph_properties)
+    justify = paragraph_properties.find("w:jc", NS)
+    if justify is None:
+        justify = ET.SubElement(paragraph_properties, q("jc"))
+    justify.set(q("val"), "center")
+
+    def add_text(text):
+        run = ET.SubElement(paragraph, q("r"))
+        node = ET.SubElement(run, q("t"))
+        node.set("{http://www.w3.org/XML/1998/namespace}space", "preserve")
+        node.text = text
+
+    def add_field(tag, value=None):
+        run = ET.SubElement(paragraph, q("r"))
+        if tag == "begin":
+            node = ET.SubElement(run, q("fldChar"))
+            node.set(q("fldCharType"), "begin")
+        elif tag == "instruction":
+            node = ET.SubElement(run, q("instrText"))
+            node.set("{http://www.w3.org/XML/1998/namespace}space", "preserve")
+            node.text = " PAGE "
+        elif tag == "separate":
+            node = ET.SubElement(run, q("fldChar"))
+            node.set(q("fldCharType"), "separate")
+        elif tag == "result":
+            node = ET.SubElement(run, q("t"))
+            node.text = value or "1"
+        else:
+            node = ET.SubElement(run, q("fldChar"))
+            node.set(q("fldCharType"), "end")
+
+    add_text("第 ")
+    add_field("begin")
+    add_field("instruction")
+    add_field("separate")
+    add_field("result", "1")
+    add_field("end")
+    add_text(" 页")
+    return ET.tostring(root, encoding="utf-8", xml_declaration=True)
+
+
+def clean_annotations(document):
+    """Remove comments and tracked-change wrappers while retaining accepted text."""
+    for tag in ("commentReference", "commentRangeStart", "commentRangeEnd"):
+        for node in document.findall(f".//w:{tag}", NS):
+            parent = node.getparent() if hasattr(node, "getparent") else None
+            if parent is not None:
+                parent.remove(node)
+            else:
+                # ElementTree does not expose parent links; remove from the owning run/paragraph.
+                for candidate in document.iter():
+                    if node in list(candidate):
+                        candidate.remove(node)
+                        break
+    # Accepted insertions are real contract text; unwrap them instead of dropping content.
+    for tag in ("ins", "moveTo"):
+        for node in document.findall(f".//w:{tag}", NS):
+            for parent in document.iter():
+                children = list(parent)
+                if node not in children:
+                    continue
+                index = children.index(node)
+                for child in list(node):
+                    node.remove(child)
+                    parent.insert(index, child)
+                    index += 1
+                parent.remove(node)
+                break
+    for tag in ("del", "moveFrom"):
+        for node in document.findall(f".//w:{tag}", NS):
+            for parent in document.iter():
+                if node in list(parent):
+                    parent.remove(node)
+                    break
 
 
 def replace_date_runs(paragraph, start_raw, end_raw):
@@ -133,16 +235,69 @@ def cells(table, row):
 
 def set_cell(table, row, column, text):
     cell = cells(table, row)[column]
+    paragraphs = cell.findall("w:p", NS)
+    paragraph = paragraphs[0] if paragraphs else ET.SubElement(cell, q("p"))
+    template_run = paragraph.find("w:r", NS)
+    properties = template_run.find("w:rPr", NS) if template_run is not None else None
+    # Some source cells split one logical value over several paragraphs. Remove
+    # those stale fragments before writing generated content, otherwise old
+    # template text remains visible after the replacement.
+    for extra in paragraphs[1:]:
+        cell.remove(extra)
+    for child in list(paragraph):
+        if child.tag != q("pPr"):
+            paragraph.remove(child)
+    pieces = str(text or "").split("\n")
+    for index, piece in enumerate(pieces):
+        run = ET.SubElement(paragraph, q("r"))
+        if properties is not None:
+            run.append(copy.deepcopy(properties))
+        node = ET.SubElement(run, q("t"))
+        node.set("{http://www.w3.org/XML/1998/namespace}space", "preserve")
+        node.text = piece
+        if index < len(pieces) - 1:
+            ET.SubElement(run, q("br"))
+
+
+def center_cell(table, row, column):
+    """Center the generated appendix cell while preserving its existing run styling."""
+    cell = cells(table, row)[column]
     paragraph = cell.find("w:p", NS)
     if paragraph is None:
         paragraph = ET.SubElement(cell, q("p"))
-    runs = paragraph_runs(paragraph)
-    if runs:
-        set_run_text(runs[0], text)
-        for run in runs[1:]:
-            set_run_text(run, "")
-    else:
-        append_value(paragraph, text)
+    paragraph_properties = paragraph.find("w:pPr", NS)
+    if paragraph_properties is None:
+        paragraph_properties = ET.Element(q("pPr"))
+        paragraph.insert(0, paragraph_properties)
+    alignment = paragraph_properties.find("w:jc", NS)
+    if alignment is None:
+        alignment = ET.SubElement(paragraph_properties, q("jc"))
+    alignment.set(q("val"), "center")
+
+
+def set_scope_alignment(table):
+    """Center all content in the appendix-II table."""
+    pattern = {
+        0: ["center", "center", "center", "center"],
+        1: ["center", "center", "center", "center"],
+        2: ["center", "center", "center", "center"],
+        3: ["center", "center", "center", "center"],
+        4: ["center", "center", "center", "center"],
+    }
+    for row_index, alignments in pattern.items():
+        for column, alignment_value in enumerate(alignments):
+            cell = cells(table, row_index)[column]
+            paragraph = cell.find("w:p", NS)
+            if paragraph is None:
+                paragraph = ET.SubElement(cell, q("p"))
+            paragraph_properties = paragraph.find("w:pPr", NS)
+            if paragraph_properties is None:
+                paragraph_properties = ET.Element(q("pPr"))
+                paragraph.insert(0, paragraph_properties)
+            alignment = paragraph_properties.find("w:jc", NS)
+            if alignment is None:
+                alignment = ET.SubElement(paragraph_properties, q("jc"))
+            alignment.set(q("val"), alignment_value)
 
 
 def service_tier(data):
@@ -188,6 +343,7 @@ def scope_rows(data, tier_name):
 def fill_template(data):
     with ZipFile(TEMPLATE) as source:
         document = ET.fromstring(source.read("word/document.xml"))
+        clean_annotations(document)
         body = document.find("w:body", NS)
         paragraphs = [node for node in body if node.tag == q("p")]
         tables = [node for node in body if node.tag == q("tbl")]
@@ -195,16 +351,17 @@ def fill_template(data):
         def p(number):
             return paragraphs[number - 1]
 
-        append_value(p(1), value(data, "contractNo"))
+        replace_underlined_runs(p(1), [value(data, "contractNo")])
         append_value(p(15), value(data, "partyAName"))
         append_value(p(16), value(data, "partyBName"))
         append_value(p(18), value(data, "signPlace"))
-        append_value(p(19), date_cn(value(data, "signDate")))
+        set_paragraph_text(p(19), date_cn(value(data, "signDate")))
         for number, keys in {
             21: ["partyAName"], 22: ["partyACode"], 23: ["partyALegal"], 24: ["partyAAddress"], 25: ["partyAPhone"],
-            27: ["partyBName"], 28: ["partyBCode"], 29: ["partyBLegal"], 30: ["partyBAddress"], 31: ["partyBPhone"], 33: ["projectName"],
+            27: ["partyBName"], 28: ["partyBCode"], 29: ["partyBLegal"], 30: ["partyBAddress"], 31: ["partyBPhone"],
         }.items():
             replace_underlined_runs(p(number), [value(data, key) for key in keys])
+        replace_underlined_runs(p(33), [value(data, "projectName").removesuffix("项目").rstrip()])
 
         edition = value(data, "edition").replace(" ", "")
         for number in range(44, 50):
@@ -257,7 +414,7 @@ def fill_template(data):
         # The source template has six fixed rows. Keep the commercial rules visible
         # while leaving optional services without invented prices.
         set_cell(quote, 1, 1, edition or "FastGPT")
-        set_cell(quote, 1, 2, "私有化部署：一次性买断税率13%；按年订阅税率6%")
+        set_cell(quote, 1, 2, "私有化部署：一次性买断，税率13%" if "买断" in edition else "私有化部署：按年订阅，税率6%")
         set_cell(quote, 1, 3, "套")
         set_cell(quote, 1, 4, value(data, "quantity", "1"))
         set_cell(quote, 1, 5, "13%" if "买断" in edition else "6%")
@@ -279,19 +436,19 @@ def fill_template(data):
         set_cell(quote, 3, 5, "6%")
         set_cell(quote, 3, 6, "")
         set_cell(quote, 4, 1, tier_name or "技术支持服务")
-        set_cell(quote, 4, 2, f"{tier_name}套餐" if tier_name else "按需填写")
+        set_cell(quote, 4, 2, f"{tier_name}套餐" if tier_name else "未选购（本次未购买技术支持）")
         set_cell(quote, 4, 3, "项")
         set_cell(quote, 4, 4, "1")
         set_cell(quote, 4, 5, "6%")
         set_cell(quote, 4, 6, money(str(service_price)) if tier_name else "")
         set_cell(quote, 5, 1, "产品定制开发")
-        set_cell(quote, 5, 2, "按需写")
+        set_cell(quote, 5, 2, "如需定制开发，双方另行书面确认范围与报价")
         set_cell(quote, 5, 3, "/")
         set_cell(quote, 5, 4, "1")
         set_cell(quote, 5, 5, "6%")
         set_cell(quote, 5, 6, "")
         set_cell(quote, 6, 1, "AI场景技术服务")
-        set_cell(quote, 6, 2, "按需写")
+        set_cell(quote, 6, 2, "如需AI场景技术服务，双方另行书面确认范围与报价")
         set_cell(quote, 6, 3, "人天")
         set_cell(quote, 6, 4, "1")
         set_cell(quote, 6, 5, "6%")
@@ -304,6 +461,7 @@ def fill_template(data):
             row = rows[index - 1] if index <= len(rows) else {}
             for column, key in enumerate(("module", "description", "deliverable", "acceptance")):
                 set_cell(scope, index, column, value(row, key))
+        set_scope_alignment(scope)
 
         # Appendix III is a fixed four-module acceptance checklist for every project.
         set_cell(acceptance, 0, 3, value(data, "contractNo"))
@@ -339,7 +497,31 @@ def main():
     document_xml = fill_template(payload)
     with ZipFile(TEMPLATE) as source, ZipFile(destination, "w", ZIP_DEFLATED) as output:
         for item in source.infolist():
-            output.writestr(item, document_xml if item.filename == "word/document.xml" else source.read(item.filename))
+            if item.filename in {"word/comments.xml", "word/commentsExtended.xml", "word/people.xml"}:
+                continue
+            item_data = source.read(item.filename)
+            if item.filename == "word/document.xml":
+                item_data = document_xml
+            elif item.filename in {"word/footer1.xml", "word/footer2.xml"}:
+                item_data = fill_footer_page_number(item_data)
+            elif item.filename == "word/_rels/document.xml.rels":
+                ET.register_namespace("", "http://schemas.openxmlformats.org/package/2006/relationships")
+                relationships = ET.fromstring(item_data)
+                for relationship in list(relationships):
+                    relation_type = relationship.attrib.get("Type", "")
+                    target = relationship.attrib.get("Target", "")
+                    if "comments" in relation_type.lower() or "people" in relation_type.lower() or target in {"comments.xml", "commentsExtended.xml", "people.xml"}:
+                        relationships.remove(relationship)
+                item_data = ET.tostring(relationships, encoding="utf-8", xml_declaration=True)
+            elif item.filename == "[Content_Types].xml":
+                ET.register_namespace("", "http://schemas.openxmlformats.org/package/2006/content-types")
+                content_types = ET.fromstring(item_data)
+                for override in list(content_types):
+                    part_name = override.attrib.get("PartName", "")
+                    if any(name in part_name.lower() for name in ("comments", "people")):
+                        content_types.remove(override)
+                item_data = ET.tostring(content_types, encoding="utf-8", xml_declaration=True)
+            output.writestr(item, item_data)
 
 
 if __name__ == "__main__":

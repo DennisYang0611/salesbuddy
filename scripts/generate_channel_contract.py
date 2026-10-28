@@ -102,6 +102,43 @@ def set_table_cell(table, row, col, text):
     set_cell_text(table_cells(table, row)[col], text)
 
 
+def fill_footer_page_number(xml_bytes):
+    """Write a live PAGE field to every section footer in the source template."""
+    root = ET.fromstring(xml_bytes)
+    paragraph = root.find("w:p", NS)
+    if paragraph is None:
+        paragraph = ET.SubElement(root, q("p"))
+    paragraph_properties = paragraph.find("w:pPr", NS)
+    for child in list(paragraph):
+        if child is not paragraph_properties:
+            paragraph.remove(child)
+    if paragraph_properties is None:
+        paragraph_properties = ET.Element(q("pPr"))
+        paragraph.insert(0, paragraph_properties)
+    justify = paragraph_properties.find("w:jc", NS)
+    if justify is None:
+        justify = ET.SubElement(paragraph_properties, q("jc"))
+    justify.set(q("val"), "center")
+
+    def run_with(child_tag, text=None, **attrs):
+        run = ET.SubElement(paragraph, q("r"))
+        node = ET.SubElement(run, q(child_tag))
+        for key, value in attrs.items():
+            node.set(q(key), value)
+        if text is not None:
+            node.set(f"{{{XML_NS}}}space", "preserve")
+            node.text = text
+
+    run_with("t", "—")
+    run_with("fldChar", fldCharType="begin")
+    run_with("instrText", " PAGE ")
+    run_with("fldChar", fldCharType="separate")
+    run_with("t", "1")
+    run_with("fldChar", fldCharType="end")
+    run_with("t", "—")
+    return ET.tostring(root, encoding="utf-8", xml_declaration=True)
+
+
 def replace_everywhere(root, replacements):
     for paragraph in root.findall(".//w:p", NS):
         original = paragraph_text(paragraph)
@@ -199,7 +236,10 @@ def main():
     document_xml = fill_template(payload)
     with ZipFile(TEMPLATE) as source, ZipFile(destination, "w", ZIP_DEFLATED) as output:
         for item in source.infolist():
-            output.writestr(item, document_xml if item.filename == "word/document.xml" else source.read(item.filename))
+            item_data = document_xml if item.filename == "word/document.xml" else source.read(item.filename)
+            if item.filename in {"word/footer1.xml", "word/footer2.xml", "word/footer3.xml"}:
+                item_data = fill_footer_page_number(item_data)
+            output.writestr(item, item_data)
 
 
 if __name__ == "__main__":
